@@ -1,10 +1,8 @@
 "use client";
 
+import Image from "next/image";
 import { Countdown } from "@/components/Countdown";
-
-/** Tenor embed — CS2 / hype téma (můžeš ID kdykoliv vyměnit v konzoli Tenor). */
-const TENOR_EMBED =
-  "https://tenor.com/embed/22094125?autoplay=true";
+import funnyCs2Gif from "@/foto/funnycs2.gif";
 
 export function SuccessScreen() {
   return (
@@ -16,13 +14,15 @@ export function SuccessScreen() {
         Těšíme se na tebe ve 4. ročníku!
       </p>
 
-      <div className="mt-8 w-full max-w-lg overflow-hidden rounded-xl border border-arena-neon/30 shadow-neon sm:mt-10 sm:rounded-2xl">
-        <iframe
-          title="CS2 hype"
-          src={TENOR_EMBED}
-          className="aspect-video w-full min-h-[180px] bg-black"
-          allow="autoplay; encrypted-media; fullscreen"
-          allowFullScreen
+      <div className="mt-8 w-full max-w-lg overflow-hidden rounded-xl border border-arena-neon/30 bg-black shadow-neon sm:mt-10 sm:rounded-2xl">
+        <Image
+          src={funnyCs2Gif}
+          alt="CS2"
+          width={800}
+          height={450}
+          unoptimized
+          className="h-auto w-full object-contain"
+          priority
         />
       </div>
 
