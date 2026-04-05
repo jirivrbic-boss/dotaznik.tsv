@@ -30,8 +30,10 @@ import {
   toCsv,
   type SurveyDoc,
 } from "@/lib/statsHelpers";
+import { QuestionAggregatesSection } from "@/components/QuestionAggregatesSection";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { buildAggregateSections } from "@/lib/questionAggregates";
 import Link from "next/link";
 
 const NEON = "#88FF00";
@@ -141,6 +143,11 @@ export function StatsDashboard() {
 
   const heardPie = useMemo(() => aggregateWhereHeard(filtered), [filtered]);
   const commBar = useMemo(() => aggregateCommunication(filtered), [filtered]);
+
+  const questionSections = useMemo(
+    () => buildAggregateSections(filtered, filter),
+    [filtered, filter],
+  );
 
   const filters: { id: Filter; label: string }[] = [
     { id: "all", label: "Vše" },
@@ -328,6 +335,21 @@ export function StatsDashboard() {
             )}
           </div>
         </Card>
+      </section>
+
+      <section className="mt-10 sm:mt-12">
+        <h2 className="text-base font-black uppercase italic text-white sm:text-lg">
+          Souhrn otázek podle filtru cesty
+        </h2>
+        <p className="mt-2 max-w-3xl text-sm leading-relaxed text-arena-muted">
+          U hodnocení 1–5 je průměr ze všech číselných odpovědí (5 = nejlepší). U
+          přepínačů a zaškrtávek jsou procenta z respondentů, kteří danou otázku
+          vyplnili. Filtr „Filtr cesty“ výše určuje, které odpovědi se započítají —
+          u „Vše“ je souhrn zvlášť pro hráče, diváky a budoucí hráče.
+        </p>
+        <div className="mt-6">
+          <QuestionAggregatesSection sections={questionSections} />
+        </div>
       </section>
 
       <section className="mt-10 sm:mt-12">
