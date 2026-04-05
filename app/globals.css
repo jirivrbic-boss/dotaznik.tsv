@@ -1,0 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --arena-black: #050505;
+  --arena-neon: #88ff00;
+  --arena-orange: #f5832b;
+  --arena-muted: #d1d1d1;
+}
+
+body {
+  @apply bg-arena-black text-white antialiased;
+}
+
+::selection {
+  background: rgba(136, 255, 0, 0.35);
+  color: #fff;
+}

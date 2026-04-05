@@ -1,0 +1,28 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function validSurveyPayload() {
+      let data = request.resource.data;
+      // timestamp může být serverTimestamp() — v pravidlech nečteme striktní typ
+      return data.keys().hasAll(['path_type', 'timestamp', 'answers'])
+        && data.path_type is string
+        && data.path_type in ['player_path', 'viewer_path', 'future_player_path']
+        && data.answers is map;
+    }
+
+    // Dotazník: kdokoli může vytvořit jeden dokument (odeslání odpovědi).
+    // Dashboard čte data na klientovi — pro produkci doporučujeme přidat Firebase Auth
+    // a podmínku např. request.auth != null && request.auth.token.admin == true pro read.
+    match /survey_responses/{docId} {
+      allow create: if validSurveyPayload();
+      allow read: if true;
+      allow update, delete: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
