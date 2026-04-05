@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { collection, getDocs, type Timestamp } from "firebase/firestore";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 import {
   Bar,
   BarChart,
@@ -47,11 +48,11 @@ function Kpi({
   value: string | number;
 }) {
   return (
-    <Card className="p-5">
-      <p className="text-xs uppercase tracking-widest text-arena-muted">
+    <Card className="p-4 sm:p-5">
+      <p className="text-[0.65rem] uppercase tracking-wider text-arena-muted sm:text-xs sm:tracking-widest">
         {label}
       </p>
-      <p className="mt-2 text-3xl font-black text-white">{value}</p>
+      <p className="mt-1.5 text-2xl font-black text-white sm:mt-2 sm:text-3xl">{value}</p>
     </Card>
   );
 }
@@ -62,6 +63,8 @@ export function StatsDashboard() {
   const [err, setErr] = useState<string | null>(null);
   const [filter, setFilter] = useState<Filter>("all");
   const [detail, setDetail] = useState<SurveyDoc | null>(null);
+  const isNarrow = useMediaQuery("(max-width: 639px)");
+  const isTablet = useMediaQuery("(max-width: 1023px)");
 
   useEffect(() => {
     const db = getDb();
@@ -146,32 +149,36 @@ export function StatsDashboard() {
     { id: "future_player_path", label: PATH_LABELS.future_player_path },
   ];
 
+  const pieRadius = isNarrow ? 52 : isTablet ? 72 : 92;
+  const chartBottom = isNarrow ? 8 : 12;
+  const axisTick = isNarrow ? 9 : 11;
+
   if (loading) {
     return (
-      <div className="flex min-h-[40vh] items-center justify-center text-arena-muted">
+      <div className="flex min-h-[40vh] items-center justify-center px-4 text-arena-muted">
         Načítám data…
       </div>
     );
   }
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-10">
-      <header className="flex flex-col gap-4 border-b border-white/10 pb-8 sm:flex-row sm:items-end sm:justify-between">
+    <div className="mx-auto max-w-7xl px-3 py-6 sm:px-4 sm:py-10 md:px-6">
+      <header className="flex flex-col gap-4 border-b border-white/10 pb-6 sm:flex-row sm:items-end sm:justify-between sm:pb-8">
         <div>
           <p className="text-xs uppercase tracking-[0.25em] text-arena-neon">
             ESPORTARENA_TSV
           </p>
-          <h1 className="mt-2 text-3xl font-black uppercase italic text-white sm:text-4xl">
+          <h1 className="mt-2 text-2xl font-black uppercase italic text-white sm:text-3xl md:text-4xl">
             Admin přehled
           </h1>
-          <p className="mt-2 max-w-xl text-sm text-arena-muted">
+          <p className="mt-2 max-w-xl text-sm leading-relaxed text-arena-muted">
             Čtení dat z kolekce <code className="text-arena-orange">survey_responses</code>.
             Pro produkci doporučujeme omezit čtení ve Firestore pravidlech (např. přes Auth).
           </p>
         </div>
         <Link
           href="/"
-          className="text-sm text-arena-orange underline-offset-4 hover:underline"
+          className="inline-flex min-h-[44px] items-center text-sm text-arena-orange underline-offset-4 hover:underline"
         >
           ← Zpět na dotazník
         </Link>
@@ -183,51 +190,60 @@ export function StatsDashboard() {
         </p>
       )}
 
-      <section className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <section className="mt-6 grid grid-cols-2 gap-3 sm:mt-10 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4">
         <Kpi label="Odpovědí (filtr)" value={kpis.totalFiltered} />
         <Kpi label="Hráči (celkem)" value={kpis.players} />
         <Kpi label="Diváci (celkem)" value={kpis.viewers} />
         <Kpi label="Budoucí hráči" value={kpis.future} />
       </section>
 
-      <section className="mt-8 flex flex-wrap items-center gap-3">
-        <span className="text-xs uppercase tracking-widest text-arena-muted">
+      <section className="mt-6 flex flex-col gap-3 sm:mt-8 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
+        <span className="text-[0.65rem] uppercase tracking-wider text-arena-muted sm:text-xs sm:tracking-widest">
           Filtr cesty
         </span>
-        {filters.map((f) => (
-          <Button
-            key={f.id}
-            variant={filter === f.id ? "primary" : "ghost"}
-            className="!py-2 !text-xs"
-            onClick={() => setFilter(f.id)}
-          >
-            {f.label}
-          </Button>
-        ))}
+        <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:gap-2">
+          {filters.map((f) => (
+            <Button
+              key={f.id}
+              variant={filter === f.id ? "primary" : "ghost"}
+              className="!min-h-[44px] w-full !py-2 !text-[0.7rem] sm:!min-h-0 sm:w-auto sm:!text-xs"
+              onClick={() => setFilter(f.id)}
+            >
+              {f.label}
+            </Button>
+          ))}
+        </div>
         <Button
           variant="secondary"
-          className="ml-auto !py-2"
+          className="w-full !min-h-[48px] sm:ml-auto sm:w-auto sm:!min-h-0"
           onClick={() => downloadCsv("esportarena_survey.csv", toCsv(filtered))}
         >
           Export CSV
         </Button>
       </section>
 
-      <section className="mt-10 grid gap-6 lg:grid-cols-2">
-        <Card className="p-6">
-          <h2 className="text-sm font-bold uppercase tracking-widest text-white">
+      <section className="mt-8 grid gap-4 sm:mt-10 sm:gap-6 lg:grid-cols-2">
+        <Card className="p-4 sm:p-6">
+          <h2 className="text-xs font-bold uppercase tracking-wider text-white sm:text-sm sm:tracking-widest">
             Průměrné hodnocení (1–5)
           </h2>
-          <p className="mt-1 text-xs text-arena-muted">
+          <p className="mt-1 text-[0.7rem] leading-relaxed text-arena-muted sm:text-xs">
             Grafika napříč cestami; admini jen u hráčů; LAN z hodnocení arény (hráči) a
             diváckého LAN (diváci).
           </p>
-          <div className="mt-4 h-72 w-full">
+          <div className="mt-3 h-56 w-full sm:mt-4 sm:h-72">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={ratingBars}>
+              <BarChart data={ratingBars} margin={{ top: 8, right: 4, left: isNarrow ? -8 : 0, bottom: chartBottom }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#333" />
-                <XAxis dataKey="name" tick={{ fill: "#D1D1D1", fontSize: 11 }} />
-                <YAxis domain={[0, 5]} tick={{ fill: "#D1D1D1", fontSize: 11 }} />
+                <XAxis
+                  dataKey="name"
+                  interval={0}
+                  angle={isNarrow ? -20 : 0}
+                  textAnchor={isNarrow ? "end" : "middle"}
+                  height={isNarrow ? 52 : 32}
+                  tick={{ fill: "#D1D1D1", fontSize: axisTick }}
+                />
+                <YAxis domain={[0, 5]} width={isNarrow ? 28 : 36} tick={{ fill: "#D1D1D1", fontSize: axisTick }} />
                 <Tooltip
                   contentStyle={{
                     background: "#0a0a0a",
@@ -242,24 +258,24 @@ export function StatsDashboard() {
           </div>
         </Card>
 
-        <Card className="p-6">
-          <h2 className="text-sm font-bold uppercase tracking-widest text-white">
+        <Card className="p-4 sm:p-6">
+          <h2 className="text-xs font-bold uppercase tracking-wider text-white sm:text-sm sm:tracking-widest">
             Kde se o turnaji řeklo
           </h2>
-          <div className="mt-4 h-72 w-full">
+          <div className="mt-3 h-56 w-full sm:mt-4 sm:h-72">
             {heardPie.length === 0 ? (
               <p className="text-sm text-arena-muted">Žádná data.</p>
             ) : (
               <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
+                <PieChart margin={{ top: 4, right: 4, bottom: isNarrow ? 4 : 8, left: 4 }}>
                   <Pie
                     data={heardPie}
                     dataKey="value"
                     nameKey="name"
                     cx="50%"
                     cy="50%"
-                    outerRadius={90}
-                    label
+                    outerRadius={pieRadius}
+                    label={!isNarrow}
                   >
                     {heardPie.map((_, i) => (
                       <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
@@ -272,26 +288,33 @@ export function StatsDashboard() {
                       borderRadius: 8,
                     }}
                   />
-                  <Legend />
+                  <Legend wrapperStyle={{ fontSize: isNarrow ? 10 : 12 }} />
                 </PieChart>
               </ResponsiveContainer>
             )}
           </div>
         </Card>
 
-        <Card className="p-6 lg:col-span-2">
-          <h2 className="text-sm font-bold uppercase tracking-widest text-white">
+        <Card className="p-4 sm:p-6 lg:col-span-2">
+          <h2 className="text-xs font-bold uppercase tracking-wider text-white sm:text-sm sm:tracking-widest">
             Discord vs WhatsApp (hráči + budoucí hráči)
           </h2>
-          <div className="mt-4 h-64 w-full">
+          <div className="mt-3 h-52 w-full sm:mt-4 sm:h-64">
             {commBar.length === 0 ? (
               <p className="text-sm text-arena-muted">Žádná data pro tento filtr.</p>
             ) : (
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={commBar}>
+                <BarChart data={commBar} margin={{ top: 8, right: 4, left: isNarrow ? -8 : 0, bottom: isNarrow ? 48 : 16 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#333" />
-                  <XAxis dataKey="name" tick={{ fill: "#D1D1D1", fontSize: 11 }} />
-                  <YAxis allowDecimals={false} tick={{ fill: "#D1D1D1", fontSize: 11 }} />
+                  <XAxis
+                    dataKey="name"
+                    interval={0}
+                    angle={isNarrow ? -25 : 0}
+                    textAnchor={isNarrow ? "end" : "middle"}
+                    height={isNarrow ? 64 : 36}
+                    tick={{ fill: "#D1D1D1", fontSize: axisTick }}
+                  />
+                  <YAxis allowDecimals={false} width={isNarrow ? 28 : 36} tick={{ fill: "#D1D1D1", fontSize: axisTick }} />
                   <Tooltip
                     contentStyle={{
                       background: "#0a0a0a",
@@ -307,11 +330,39 @@ export function StatsDashboard() {
         </Card>
       </section>
 
-      <section className="mt-12">
-        <h2 className="text-lg font-black uppercase italic text-white">
+      <section className="mt-10 sm:mt-12">
+        <h2 className="text-base font-black uppercase italic text-white sm:text-lg">
           Jednotlivé odpovědi
         </h2>
-        <div className="mt-4 overflow-x-auto rounded-2xl border border-white/10">
+
+        <div className="mt-4 space-y-3 md:hidden">
+          {filtered.map((r) => (
+            <button
+              key={r.id}
+              type="button"
+              onClick={() => setDetail(r)}
+              className="w-full rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-left transition-colors active:bg-white/[0.06]"
+            >
+              <div className="flex items-start justify-between gap-2">
+                <span className="text-sm font-medium text-white">
+                  {PATH_LABELS[r.path_type] ?? r.path_type}
+                </span>
+                <span className="shrink-0 text-xs text-arena-orange">Detail →</span>
+              </div>
+              <p className="mt-2 text-[0.7rem] text-arena-muted">
+                {formatTimestamp(r.timestamp)}
+              </p>
+              <p className="mt-1 truncate font-mono text-[0.65rem] text-arena-muted/80">
+                {r.id}
+              </p>
+            </button>
+          ))}
+          {filtered.length === 0 && (
+            <p className="text-sm text-arena-muted">Žádné záznamy.</p>
+          )}
+        </div>
+
+        <div className="mt-4 hidden overflow-x-auto rounded-2xl border border-white/10 md:block">
           <table className="min-w-full text-left text-sm">
             <thead className="bg-white/5 text-xs uppercase tracking-wider text-arena-muted">
               <tr>
@@ -354,19 +405,21 @@ export function StatsDashboard() {
 
       {detail && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-end justify-center bg-black/80 p-0 backdrop-blur-sm sm:items-center sm:p-4"
           role="dialog"
           aria-modal="true"
         >
-          <Card className="max-h-[85vh] w-full max-w-2xl overflow-y-auto p-6">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <p className="text-xs uppercase tracking-widest text-arena-neon">
+          <Card className="max-h-[92dvh] w-full max-w-2xl overflow-y-auto rounded-t-2xl border-white/20 p-4 pb-[max(1.25rem,env(safe-area-inset-bottom))] sm:rounded-2xl sm:p-6 sm:pb-6">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0 flex-1">
+                <p className="text-[0.65rem] uppercase tracking-wider text-arena-neon sm:text-xs sm:tracking-widest">
                   Detail odpovědi
                 </p>
-                <p className="mt-1 font-mono text-xs text-arena-muted">{detail.id}</p>
+                <p className="mt-1 break-all font-mono text-[0.65rem] text-arena-muted sm:text-xs">
+                  {detail.id}
+                </p>
               </div>
-              <Button variant="ghost" onClick={() => setDetail(null)}>
+              <Button variant="ghost" className="shrink-0" onClick={() => setDetail(null)}>
                 Zavřít
               </Button>
             </div>

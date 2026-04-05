@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Montserrat } from "next/font/google";
 import { ClientAnalytics } from "@/components/ClientAnalytics";
 import "./globals.css";
@@ -8,6 +8,13 @@ const montserrat = Montserrat({
   variable: "--font-montserrat",
   display: "swap",
 });
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: "#050505",
+};
 
 export const metadata: Metadata = {
   title: "ESPORTARENA_TSV — Dotazník",
@@ -21,7 +28,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="cs" className={montserrat.variable}>
-      <body className="min-h-screen font-sans">
+      <body className="min-h-dvh min-h-screen font-sans">
         <ClientAnalytics />
         {children}
       </body>

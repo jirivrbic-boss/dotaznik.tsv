@@ -12,7 +12,6 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { SurveyStepForm } from "@/components/SurveyStepForm";
 import { SuccessScreen } from "@/components/SuccessScreen";
-import Link from "next/link";
 
 export function SurveyApp() {
   const [answers, setAnswers] = useState<SurveyAnswers>({});
@@ -93,26 +92,26 @@ export function SurveyApp() {
   }
 
   return (
-    <div className="relative min-h-screen overflow-hidden px-4 pb-20 pt-8">
+    <div className="relative min-h-dvh min-h-screen overflow-x-hidden px-3 pb-[max(5rem,env(safe-area-inset-bottom))] pt-[max(1.5rem,env(safe-area-inset-top))] sm:px-4 sm:pb-20 sm:pt-8 md:px-6">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(136,255,0,0.08),transparent_50%)]" />
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,_rgba(245,131,43,0.06),transparent_45%)]" />
 
-      <header className="relative mx-auto flex max-w-3xl flex-col items-center gap-6">
+      <header className="relative mx-auto flex max-w-3xl flex-col items-center gap-4 sm:gap-6">
         <Image
           src="/foto/tournament-logo.png"
           alt="ESPORTARENA TSV"
           width={280}
           height={120}
-          className="h-auto w-[min(280px,85vw)] object-contain drop-shadow-[0_0_20px_rgba(136,255,0,0.2)]"
+          className="h-auto w-[min(240px,78vw)] object-contain drop-shadow-[0_0_20px_rgba(136,255,0,0.2)] sm:w-[min(280px,85vw)]"
           priority
         />
-        <p className="text-center text-xs uppercase tracking-[0.2em] text-arena-muted">
+        <p className="px-2 text-center text-[0.65rem] uppercase tracking-[0.18em] text-arena-muted sm:text-xs sm:tracking-[0.2em]">
           Dotazník — 3. sezóna
         </p>
       </header>
 
-      <div className="relative mx-auto mt-10 max-w-3xl">
-        <div className="mb-4 flex items-center justify-between gap-4 text-xs text-arena-muted">
+      <div className="relative mx-auto mt-6 max-w-3xl sm:mt-10">
+        <div className="mb-3 flex items-center justify-between gap-3 text-[0.7rem] text-arena-muted sm:mb-4 sm:text-xs">
           <span>
             Krok {currentNumber} / {totalSteps}
           </span>
@@ -128,7 +127,7 @@ export function SurveyApp() {
         </div>
       </div>
 
-      <main className="relative mx-auto mt-10 max-w-3xl">
+      <main className="relative mx-auto mt-6 max-w-3xl sm:mt-10">
         <AnimatePresence mode="wait">
           <motion.div
             key={`${path ?? "gateway"}-${pathStepIndex}`}
@@ -137,11 +136,11 @@ export function SurveyApp() {
             exit={{ opacity: 0, y: -12 }}
             transition={{ duration: 0.25 }}
           >
-            <Card className="p-6 sm:p-10">
-              <h2 className="text-lg font-black uppercase italic leading-snug text-white sm:text-xl">
+            <Card className="p-4 sm:p-6 md:p-10">
+              <h2 className="text-base font-black uppercase italic leading-snug text-white sm:text-lg md:text-xl">
                 {currentStep.title}
               </h2>
-              <div className="mt-8">
+              <div className="mt-6 sm:mt-8">
                 <SurveyStepForm
                   step={currentStep}
                   answers={answers}
@@ -153,17 +152,11 @@ export function SurveyApp() {
                   {error}
                 </p>
               )}
-              <div className="mt-10 flex flex-wrap items-center justify-between gap-3">
-                {path ? (
-                  <Button variant="ghost" type="button" onClick={goBack}>
-                    Zpět
-                  </Button>
-                ) : (
-                  <span />
-                )}
+              <div className="mt-8 flex flex-col gap-3 sm:mt-10 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
                 <Button
                   type="button"
                   variant="primary"
+                  className="order-1 w-full sm:order-2 sm:w-auto"
                   disabled={!canProceed || submitting}
                   onClick={goNext}
                 >
@@ -173,19 +166,20 @@ export function SurveyApp() {
                       : "Odeslat dotazník"
                     : "Další"}
                 </Button>
+                {path ? (
+                  <Button
+                    variant="ghost"
+                    type="button"
+                    className="order-2 w-full sm:order-1 sm:w-auto"
+                    onClick={goBack}
+                  >
+                    Zpět
+                  </Button>
+                ) : null}
               </div>
             </Card>
           </motion.div>
         </AnimatePresence>
-
-        <p className="mt-10 text-center text-xs text-arena-muted/80">
-          <Link
-            href="/stats"
-            className="underline decoration-arena-orange/60 underline-offset-4 hover:text-arena-orange"
-          >
-            Admin přehled (/stats)
-          </Link>
-        </p>
       </main>
     </div>
   );

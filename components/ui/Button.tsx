@@ -21,7 +21,7 @@ export function Button({
     <button
       type="button"
       disabled={disabled}
-      className={`inline-flex items-center justify-center rounded-lg px-5 py-2.5 text-sm disabled:opacity-40 disabled:pointer-events-none ${variants[variant]} ${className}`}
+      className={`inline-flex min-h-[48px] min-w-[48px] items-center justify-center rounded-lg px-5 py-3 text-sm sm:min-h-0 sm:min-w-0 sm:py-2.5 disabled:opacity-40 disabled:pointer-events-none active:scale-[0.98] sm:active:scale-100 ${variants[variant]} ${className}`}
       {...props}
     />
   );

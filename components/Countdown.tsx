@@ -30,16 +30,16 @@ export function Countdown() {
   ] as const;
 
   return (
-    <div className="mt-8 grid w-full max-w-2xl grid-cols-2 gap-3 sm:grid-cols-4">
+    <div className="mt-6 grid w-full max-w-2xl grid-cols-2 gap-2 sm:mt-8 sm:grid-cols-4 sm:gap-3">
       {items.map((item) => (
         <div
           key={item.label}
-          className="rounded-xl border border-arena-neon/40 bg-black/60 px-3 py-4 text-center shadow-neon"
+          className="rounded-lg border border-arena-neon/40 bg-black/60 px-2 py-3 text-center shadow-neon sm:rounded-xl sm:px-3 sm:py-4"
         >
-          <div className="font-mono text-3xl font-black tabular-nums text-arena-neon sm:text-4xl">
+          <div className="font-mono text-2xl font-black tabular-nums text-arena-neon min-[400px]:text-3xl sm:text-4xl">
             {item.pad ? pad(item.value) : item.value}
           </div>
-          <div className="mt-1 text-xs uppercase tracking-widest text-arena-muted">
+          <div className="mt-1 text-[0.6rem] uppercase tracking-wider text-arena-muted sm:text-xs sm:tracking-widest">
             {item.label}
           </div>
         </div>

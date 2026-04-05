@@ -9,8 +9,13 @@
   --arena-muted: #d1d1d1;
 }
 
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
 body {
   @apply bg-arena-black text-white antialiased;
+  overflow-x: hidden;
 }
 
 ::selection {
