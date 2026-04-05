@@ -70,7 +70,7 @@ export function StatsDashboard() {
     const db = getDb();
     if (!db) {
       setErr(
-        "Firebase není nakonfigurováno — doplň NEXT_PUBLIC_FIREBASE_* v .env.local.",
+        "Firebase není nakonfigurováno. Lokálně: .env.local s NEXT_PUBLIC_FIREBASE_*. Na Vercelu: Settings → Environment Variables — stejné klíče a zaškrtni Production i Preview, pak Redeploy.",
       );
       setLoading(false);
       return;

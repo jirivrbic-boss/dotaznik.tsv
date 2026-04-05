@@ -53,7 +53,7 @@ export function SurveyApp() {
     const db = getDb();
     if (!db) {
       setError(
-        "Firebase není nakonfigurováno. Zkontroluj soubor .env.local (NEXT_PUBLIC_FIREBASE_*).",
+        "Firebase není nakonfigurováno. Lokálně použij .env.local se všemi NEXT_PUBLIC_FIREBASE_*. Na Vercelu: Settings → Environment Variables — přidej stejné hodnoty a zaškrtni i „Preview“ (ne jen Production), pak Redeploy.",
       );
       return;
     }

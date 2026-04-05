@@ -13,6 +13,45 @@ type Props = {
 const optionLabelClass =
   "flex min-h-[3rem] cursor-pointer items-start gap-3 rounded-xl border px-3 py-3.5 transition-colors sm:min-h-0 sm:items-center sm:px-4 sm:py-3";
 
+/** 1 = nejslabší … 5 = nejlepší (stejná logika jako „hvězdy“, jen školními slovy). */
+const SCHOOL_RATING_LABEL: Record<number, string> = {
+  1: "Nedostatečně",
+  2: "Dostatečně",
+  3: "Dobře",
+  4: "Chvalitebně",
+  5: "Výborně",
+};
+
+function RatingButton({
+  n,
+  selected,
+  onSelect,
+}: {
+  n: number;
+  selected: boolean;
+  onSelect: () => void;
+}) {
+  const word = SCHOOL_RATING_LABEL[n] ?? String(n);
+  return (
+    <button
+      type="button"
+      onClick={onSelect}
+      className={`flex min-h-[3.25rem] flex-col items-center justify-center gap-0.5 rounded-lg border px-1 py-2 transition-all sm:min-h-[3.75rem] sm:min-w-[5.25rem] sm:px-2 ${
+        selected
+          ? "border-arena-neon bg-arena-neon/20 text-arena-neon shadow-neon"
+          : "border-white/15 text-arena-muted active:border-arena-orange/60 active:text-white sm:hover:border-arena-orange/60 sm:hover:text-white"
+      }`}
+    >
+      <span className="font-mono text-sm font-bold tabular-nums opacity-90 sm:text-base">
+        {n}
+      </span>
+      <span className="text-center text-[0.58rem] font-medium leading-[1.15] normal-case sm:text-[0.7rem]">
+        {word}
+      </span>
+    </button>
+  );
+}
+
 export function SurveyStepForm({ step, answers, setAnswers }: Props) {
   const patch = (partial: SurveyAnswers) =>
     setAnswers({ ...answers, ...partial });
@@ -120,20 +159,14 @@ export function SurveyStepForm({ step, answers, setAnswers }: Props) {
       const max = step.max ?? 5;
       const val = answers[step.id] as number | undefined;
       return (
-        <div className="grid grid-cols-5 gap-2 sm:flex sm:flex-wrap">
+        <div className="grid grid-cols-5 gap-1.5 sm:flex sm:flex-wrap sm:gap-2">
           {Array.from({ length: max }, (_, i) => i + 1).map((n) => (
-            <button
+            <RatingButton
               key={n}
-              type="button"
-              onClick={() => patch({ [step.id]: n })}
-              className={`flex min-h-[48px] items-center justify-center rounded-lg border text-lg font-bold transition-all sm:h-12 sm:min-w-[3rem] ${
-                val === n
-                  ? "border-arena-neon bg-arena-neon/20 text-arena-neon shadow-neon"
-                  : "border-white/15 text-arena-muted active:border-arena-orange/60 active:text-white sm:hover:border-arena-orange/60 sm:hover:text-white"
-              }`}
-            >
-              {n}
-            </button>
+              n={n}
+              selected={val === n}
+              onSelect={() => patch({ [step.id]: n })}
+            />
           ))}
         </div>
       );
@@ -143,20 +176,14 @@ export function SurveyStepForm({ step, answers, setAnswers }: Props) {
       const max = step.max ?? 5;
       return (
         <div className="flex flex-col gap-4">
-          <div className="grid grid-cols-5 gap-2 sm:flex sm:flex-wrap">
+          <div className="grid grid-cols-5 gap-1.5 sm:flex sm:flex-wrap sm:gap-2">
             {Array.from({ length: max }, (_, i) => i + 1).map((n) => (
-              <button
+              <RatingButton
                 key={n}
-                type="button"
-                onClick={() => patch({ [step.id]: n })}
-                className={`flex min-h-[48px] items-center justify-center rounded-lg border text-lg font-bold transition-all sm:h-12 sm:min-w-[3rem] ${
-                  val === n
-                    ? "border-arena-neon bg-arena-neon/20 text-arena-neon shadow-neon"
-                    : "border-white/15 text-arena-muted active:border-arena-orange/60 active:text-white sm:hover:border-arena-orange/60 sm:hover:text-white"
-                }`}
-              >
-                {n}
-              </button>
+                n={n}
+                selected={val === n}
+                onSelect={() => patch({ [step.id]: n })}
+              />
             ))}
           </div>
           <label
