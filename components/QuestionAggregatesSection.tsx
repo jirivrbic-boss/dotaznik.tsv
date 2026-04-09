@@ -1,7 +1,9 @@
 "use client";
 
+import { useRef, useState } from "react";
 import type { AggregateSection, QuestionSummary } from "@/lib/questionAggregates";
 import { ratingScaleHint } from "@/lib/questionAggregates";
+import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 
 function DistBar({ label, pct }: { label: string; pct: number }) {
@@ -17,6 +19,57 @@ function DistBar({ label, pct }: { label: string; pct: number }) {
           style={{ width: `${Math.min(100, pct)}%` }}
         />
       </div>
+    </div>
+  );
+}
+
+function ExpandableAnswerList({ texts }: { texts: string[] }) {
+  const [open, setOpen] = useState(false);
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  const toggle = () => {
+    const next = !open;
+    setOpen(next);
+    if (next) {
+      requestAnimationFrame(() => {
+        panelRef.current?.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      });
+    }
+  };
+
+  if (texts.length === 0) return null;
+
+  return (
+    <div className="mt-3">
+      <Button
+        variant="secondary"
+        type="button"
+        className="!min-h-[40px] !px-4 !py-2 !text-xs"
+        onClick={toggle}
+        aria-expanded={open}
+      >
+        {open ? "Skrýt odpovědi" : "Zobrazit odpovědi"}
+      </Button>
+      {open ? (
+        <div
+          ref={panelRef}
+          className="mt-4 max-h-[min(70vh,32rem)] space-y-4 overflow-y-auto rounded-xl border border-arena-neon/25 bg-black/50 p-4"
+        >
+          {texts.map((t, i) => (
+            <figure key={i} className="border-l-2 border-arena-orange/70 pl-3">
+              <figcaption className="mb-1 text-[0.65rem] uppercase tracking-wider text-arena-muted">
+                Odpověď {i + 1} / {texts.length}
+              </figcaption>
+              <blockquote className="whitespace-pre-wrap text-sm leading-relaxed text-white">
+                {t}
+              </blockquote>
+            </figure>
+          ))}
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -96,6 +149,14 @@ function SummaryBlock({ s }: { s: QuestionSummary }) {
           {s.rows.map((row) => (
             <DistBar key={row.label} label={row.label} pct={row.pct} />
           ))}
+          {s.otherTexts.length > 0 ? (
+            <div className="mt-4 border-t border-white/10 pt-4">
+              <p className="text-xs font-medium text-arena-orange">
+                Doplňující texty (možnost „Jiné“)
+              </p>
+              <ExpandableAnswerList texts={s.otherTexts} />
+            </div>
+          ) : null}
         </div>
       );
     case "checkbox":
@@ -114,11 +175,14 @@ function SummaryBlock({ s }: { s: QuestionSummary }) {
       );
     case "textarea":
       return (
-        <p className="text-sm text-arena-muted">
-          Text vyplnilo{" "}
-          <span className="font-mono text-arena-neon">{s.filled}</span> z{" "}
-          <span className="text-white">{s.rowCount}</span>
-        </p>
+        <div>
+          <p className="text-sm text-arena-muted">
+            Text vyplnilo{" "}
+            <span className="font-mono text-arena-neon">{s.filled}</span> z{" "}
+            <span className="text-white">{s.rowCount}</span>
+          </p>
+          <ExpandableAnswerList texts={s.texts} />
+        </div>
       );
     default:
       return null;
@@ -156,7 +220,10 @@ export function QuestionAggregatesSection({
           </h3>
           <div className="mt-4 space-y-4">
             {sec.summaries.map((s) => (
-              <Card key={s.id} className="p-4 sm:p-5">
+              <Card
+                key={`${sec.pathType}-${s.id}`}
+                className="p-4 sm:p-5"
+              >
                 <h4 className="text-sm font-semibold leading-snug text-white sm:text-base">
                   {s.title}
                 </h4>

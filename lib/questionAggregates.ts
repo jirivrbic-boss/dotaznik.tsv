@@ -58,6 +58,7 @@ export type QuestionSummary =
       answered: number;
       rowCount: number;
       otherFilled: number;
+      otherTexts: string[];
       rows: { label: string; count: number; pct: number }[];
     }
   | {
@@ -74,6 +75,7 @@ export type QuestionSummary =
       title: string;
       filled: number;
       rowCount: number;
+      texts: string[];
     };
 
 function summarizeStep(
@@ -163,6 +165,7 @@ function summarizeStep(
     case "radio_other": {
       const otherKey = `${step.id}_other`;
       const counts = new Map<string, number>();
+      const otherTexts: string[] = [];
       let answered = 0;
       let otherFilled = 0;
       for (const r of rows) {
@@ -172,7 +175,10 @@ function summarizeStep(
           counts.set(v, (counts.get(v) ?? 0) + 1);
         }
         const ot = r.answers[otherKey];
-        if (typeof ot === "string" && ot.trim()) otherFilled++;
+        if (typeof ot === "string" && ot.trim()) {
+          otherFilled++;
+          otherTexts.push(ot.trim());
+        }
       }
       if (answered === 0 && otherFilled === 0) return null;
       const known = new Set(step.options.map((o) => o.value));
@@ -202,6 +208,7 @@ function summarizeStep(
         answered,
         rowCount,
         otherFilled,
+        otherTexts,
         rows: rowsOut,
       };
     }
@@ -234,18 +241,19 @@ function summarizeStep(
       };
     }
     case "textarea": {
-      let filled = 0;
+      const texts: string[] = [];
       for (const r of rows) {
         const v = r.answers[step.id];
-        if (typeof v === "string" && v.trim()) filled++;
+        if (typeof v === "string" && v.trim()) texts.push(v.trim());
       }
-      if (filled === 0) return null;
+      if (texts.length === 0) return null;
       return {
         kind: "textarea",
         id: step.id,
         title: step.title,
-        filled,
+        filled: texts.length,
         rowCount,
+        texts,
       };
     }
     default:
